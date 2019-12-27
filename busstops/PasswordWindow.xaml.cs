@@ -39,7 +39,6 @@ namespace busstops
                 SqlCommand sqlCmd = new SqlCommand("SELECT * FROM BUS", sqlConnection);
                 sqlConnection.Open();
                 SqlDataReader sqlReader = sqlCmd.ExecuteReader();
-
                 while (sqlReader.Read())
                 {
                     buscombobox.Items.Add(sqlReader["number"].ToString());
@@ -57,10 +56,19 @@ namespace busstops
                 using (SqlConnection myConnection = new SqlConnection(@"Data Source=WIN-IEUAMMVRABR\SQLEXPRESS;Initial Catalog=MaxKravtsevich;Integrated Security=True"))
                 {
                     myConnection.Open();
-                    SqlCommand command = new SqlCommand("INSERT INTO [Bus] (driver,number) VALUES (@driver,@number)", myConnection);
-                    command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
-                    command.Parameters.AddWithValue("@number", Convert.ToInt32(adddriverwindow.Number.Text));
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        SqlCommand command = new SqlCommand("UPDATE Bus SET driver = @driver Where stop = @id and number = " + Convert.ToInt32(adddriverwindow.Number.Text), myConnection);
+                        command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
+                        command.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                        SqlCommand command = new SqlCommand("INSERT INTO [Bus] (driver,number) VALUES (@driver,@number)", myConnection);
+                        command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
+                        command.Parameters.AddWithValue("@number", Convert.ToInt32(adddriverwindow.Number.Text));
+                        command.ExecuteNonQuery();
+                    }
                     myConnection.Close();
                 }
                 FillCombo();

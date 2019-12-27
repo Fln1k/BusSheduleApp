@@ -23,4 +23,5 @@ C:\Users\User\source\repos\busstops\busstops\obj\Debug\PasswordWindow.g.cs
 C:\Users\User\source\repos\busstops\busstops\obj\Debug\PasswordWindow.baml
 C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window2.g.cs
 C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window2.baml
-C:\Users\User\source\repos\busstops\busstops\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window3.g.cs
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window3.baml

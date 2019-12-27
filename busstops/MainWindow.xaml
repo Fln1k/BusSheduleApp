@@ -25,8 +25,11 @@
                         <MenuItem Header="Маршруты" Name="Route" Click="ShowDBPanel" />
                         <MenuItem Header="Поездки" Name="Trip" Click="ShowDBPanel" />
                         <MenuItem Header="Время Прибытия" Name="Arrive_Time" Click="ShowDBPanel" />
+                    </MenuItem> 
+                    <MenuItem Header="Изменение"> 
+                        <MenuItem Header="Маршруты" Click="AddRoutePanel"/>
+                        <MenuItem Header="Автобусы" Click="updateDriver"/>
                     </MenuItem>
-                    <MenuItem Header="Добавление" Click="AddRoutePanel" />
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Выйти" Click="Close" />
@@ -48,7 +51,7 @@
         <Grid  Name="AddDBRoutePanel" Margin="0,50,0,0"> <!--Visibility="Hidden" -->
             <Label Content="Номер" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             <TextBox Name="RouteNumberInAddDBPanel" HorizontalAlignment="Center" Margin="0,40,0,0" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-            <Button Content="Найти/Добавить" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalAlignment="Top" Width="200" Click="FillTrip"/>
+            <Button Content="Найти/Добавить" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalAlignment="Top" Width="200" Click="FillTrip1"/>
             <WrapPanel Name="AddDBRoutePanelTrip" HorizontalAlignment="Left" Height="100" Margin="0,120,0,0" VerticalAlignment="Top" Width="1366"/>
             <DataGrid Name="ArriveInAddDBGrid" HorizontalAlignment="Left" Height="425" Margin="0,220,-8,0" VerticalAlignment="Top" Width="1366"/>
             <Button x:Name="Update" Content="Обновить" HorizontalAlignment="Center" Margin="0,650,0,0" VerticalAlignment="Top" Width="200" Click="UpdateDB"  Visibility="Hidden"/>

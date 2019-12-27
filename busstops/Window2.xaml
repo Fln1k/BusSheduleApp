@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:busstops"
         mc:Ignorable="d"
-        Title="Window2" Height="174" Width="205.5">
+        Title="Window2" Height="212" Width="262.167">
     <Grid>
         <Label Content="Водитель" Margin="10,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Center"/>
-        <TextBox Name="Name" HorizontalAlignment="Left" Height="20" Margin="0,20,0 ,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200"/>
-        <Label Content="Номер" Margin="0,40,0,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Center"/>
-        <TextBox Name="Number" HorizontalAlignment="Left" Height="20" Margin="0,60,0 ,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200"/>
-        <WrapPanel HorizontalAlignment="Center" Margin="12,90,10,0" Width="176" RenderTransformOrigin="0.557,0.481">
+        <TextBox Name="Name" HorizontalAlignment="Left" Height="25" Margin="10,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234"/>
+        <Label Content="Номер" Margin="105,48,104,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Center"/>
+        <TextBox Name="Number" HorizontalAlignment="Left" Height="30" Margin="10,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234"/>
+        <WrapPanel HorizontalAlignment="Center" Margin="12,142,10,0" Width="176" RenderTransformOrigin="0.557,0.481">
             <Button IsCancel="True" MinWidth="60" Content="Отмена" Width="100"/>
             <Button IsDefault="True" Click="Accept_Click" MinWidth="60" Margin="5,0,0,0" Content="OK" Width="71"/>
         </WrapPanel>
