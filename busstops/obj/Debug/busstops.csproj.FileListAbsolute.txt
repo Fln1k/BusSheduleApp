@@ -25,3 +25,9 @@ C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window2.g.cs
 C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window2.baml
 C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window3.g.cs
 C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window3.baml
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window4.g.cs
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window4.baml
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window5.g.cs
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Window5.baml
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\Interop.LCC11.dll
+C:\Users\User\source\repos\busstops\busstops\obj\Debug\busstops.csproj.ResolveComReference.cache

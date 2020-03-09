@@ -58,16 +58,13 @@ namespace busstops
                     myConnection.Open();
                     try
                     {
-                        SqlCommand command = new SqlCommand("UPDATE Bus SET driver = @driver Where stop = @id and number = " + Convert.ToInt32(adddriverwindow.Number.Text), myConnection);
-                        command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
+                        SqlCommand command = new SqlCommand("INSERT INTO [Bus] (number) VALUES (@number)", myConnection);
+                        command.Parameters.AddWithValue("@number", Convert.ToInt32(adddriverwindow.Number.Text));
                         command.ExecuteNonQuery();
                     }
                     catch
                     {
-                        SqlCommand command = new SqlCommand("INSERT INTO [Bus] (driver,number) VALUES (@driver,@number)", myConnection);
-                        command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
-                        command.Parameters.AddWithValue("@number", Convert.ToInt32(adddriverwindow.Number.Text));
-                        command.ExecuteNonQuery();
+                        
                     }
                     myConnection.Close();
                 }

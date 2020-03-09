@@ -25,30 +25,38 @@
                         <MenuItem Header="Маршруты" Name="Route" Click="ShowDBPanel" />
                         <MenuItem Header="Поездки" Name="Trip" Click="ShowDBPanel" />
                         <MenuItem Header="Время Прибытия" Name="Arrive_Time" Click="ShowDBPanel" />
-                    </MenuItem> 
-                    <MenuItem Header="Изменение"> 
+                    </MenuItem>
+                    <MenuItem Header="Изменение">
                         <MenuItem Header="Маршруты" Click="AddRoutePanel"/>
-                        <MenuItem Header="Автобусы" Click="updateDriver"/>
                     </MenuItem>
                 </MenuItem>
             </MenuItem>
+            <MenuItem Header="Отчёты">
+                <MenuItem Header="По текущей таблице просмотра" Click="Allw_Click"/>
+            </MenuItem>
+            <MenuItem Header="Справка" Click="Quest" />
             <MenuItem Header="Выйти" Click="Close" />
         </Menu>
         <Grid Name="MainPanel" Visibility="Hidden">
             <WrapPanel Name="wrapPanel" Background="#FFF2F2F2" Orientation="Vertical" Width="1366" Margin="0,50,0,0">
-
             </WrapPanel>
         </Grid>
-        <Grid  Name="RoutePanel"  Margin="0,50,0,0" Visibility="Hidden">
-            <Label x:Name="RouteNumber" Content="111" Margin="10,-14,0,0" VerticalAlignment="Top" Width="1366" HorizontalAlignment="Left" HorizontalContentAlignment="Center" FontFamily="Tele-Marines" FontSize="48"/>
-            <ScrollViewer Margin="0,25,0,0">
+        <Grid  Name="RoutePanel"  Margin="0,50,0,0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="49*"/>
+                <ColumnDefinition Width="48*"/>
+            </Grid.ColumnDefinitions>
+            <Label x:Name="RouteNumber" Content="111" Margin="10,-14,-18,0" VerticalAlignment="Top" Width="1366" HorizontalAlignment="Left" HorizontalContentAlignment="Center" FontFamily="Tele-Marines" FontSize="48" Grid.ColumnSpan="2"/>
+            <Button x:Name="ChangeTypeB" Content="↑↓   1" HorizontalAlignment="Center" VerticalAlignment="Top" Width="50" Click="ChangeType" Margin="612,-14,10,0" Grid.Column="1" />
+            <ScrollViewer Margin="0,25,0,0" Grid.ColumnSpan="2">
                 <StackPanel x:Name="Stops"/>
             </ScrollViewer>
         </Grid>
         <Grid  Name="DBPanel" Margin="0,50,0,0"  Visibility="Hidden">
             <DataGrid Name="BusGrid"  Width="1366" VerticalAlignment="Top"  HorizontalAlignment="Left" Margin="0,32,0,0" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="True" CanUserReorderColumns="False" IsReadOnly="True"/>
         </Grid>
-        <Grid  Name="AddDBRoutePanel" Margin="0,50,0,0"> <!--Visibility="Hidden" -->
+        <Grid  Name="AddDBRoutePanel" Margin="0,50,0,0" Visibility="Hidden">
+            <!--Visibility="Hidden" -->
             <Label Content="Номер" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             <TextBox Name="RouteNumberInAddDBPanel" HorizontalAlignment="Center" Margin="0,40,0,0" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
             <Button Content="Найти/Добавить" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalAlignment="Top" Width="200" Click="FillTrip1"/>

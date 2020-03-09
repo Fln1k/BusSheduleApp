@@ -16,18 +16,63 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data;
 using System.Windows.Controls.Primitives;
+using Microsoft.Win32;
+using System.Diagnostics;
+
 
 namespace busstops
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
+    /// 
     public partial class MainWindow : Window
     {
+        Button Temp_Button = new Button();
         public MainWindow()
         {
             InitializeComponent();
             ShowMainPanel();
+        }
+
+        private void Quest(object sender, RoutedEventArgs e)
+        {
+            Process.Start("index.htm", "");
+
+        }
+        private void Allw_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Office.Interop.Excel.Application app = null;
+            Microsoft.Office.Interop.Excel.Workbook wb = null;
+            Microsoft.Office.Interop.Excel.Worksheet ws = null;
+            var process = Process.GetProcessesByName("EXCEL");
+
+            SaveFileDialog openDlg = new SaveFileDialog();
+            openDlg.FileName = "Отчёт";
+            openDlg.Filter = "Excel (.xls)|*.xls |Excel (.xlsx)|*.xlsx |All files (*.*)|*.*";
+            openDlg.FilterIndex = 2;
+            openDlg.RestoreDirectory = true;
+            string path = openDlg.FileName;
+
+            if (openDlg.ShowDialog() == true)
+            {
+                app = new Microsoft.Office.Interop.Excel.Application();
+                app.Visible = true;
+                app.DisplayAlerts = false;
+                wb = app.Workbooks.Add();
+                ws = wb.ActiveSheet;
+                BusGrid.SelectAllCells();
+                BusGrid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+                ApplicationCommands.Copy.Execute(null, BusGrid);
+                ws.Paste();
+                ws.Range["A1", "G1"].Font.Bold = true;
+                int number1 = ws.UsedRange.Rows.Count;
+                Microsoft.Office.Interop.Excel.Range myRange = ws.Range["A1", "G" + number1];
+                myRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                myRange.WrapText = false;
+                ws.Columns.EntireColumn.AutoFit();
+                wb.SaveAs(path);
+            }
         }
 
         private void ShowMainPanel(object sender, RoutedEventArgs e)
@@ -111,7 +156,7 @@ namespace busstops
                         }
                         catch
                         {
-                           
+
                         }
                     }
                     Dictionary<string, int> stop_ids = new Dictionary<string, int>();
@@ -259,22 +304,12 @@ namespace busstops
                         myConnection.Open();
                         try
                         {
-                            SqlCommand command = new SqlCommand("UPDATE Bus SET driver = @driver Where number = " + Convert.ToInt32(adddriverwindow.Number.Text), myConnection);
-                            command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
+                            SqlCommand command = new SqlCommand("INSERT INTO [Bus] (number) VALUES (@number)", myConnection);
+                            command.Parameters.AddWithValue("@number", Convert.ToInt32(adddriverwindow.Number.Text));
                             command.ExecuteNonQuery();
                         }
                         catch
                         {
-                            try
-                            {
-                                SqlCommand command = new SqlCommand("INSERT INTO [Bus] (driver,number) VALUES (@driver,@number)", myConnection);
-                                command.Parameters.AddWithValue("@driver", adddriverwindow.Name.Text);
-                                command.Parameters.AddWithValue("@number", Convert.ToInt32(adddriverwindow.Number.Text));
-                                command.ExecuteNonQuery();
-                            }
-                            catch
-                            {
-                            }
                         }
                         myConnection.Close();
                     }
@@ -289,63 +324,73 @@ namespace busstops
         {
             try
             {
+                MessageBox.Show("Выберите Автобус");
                 Window1 passwordWindow = new Window1();
                 if (passwordWindow.ShowDialog() == true)
                 {
+                    MessageBox.Show("Выберите тип дня");
                     Window3 days = new Window3();
                     if (days.ShowDialog() == true)
                     {
-                        Button button = (Button)sender;
-                        using (SqlConnection myConnection = new SqlConnection(@"Data Source=WIN-IEUAMMVRABR\SQLEXPRESS;Initial Catalog=MaxKravtsevich;Integrated Security=True"))
+                        Window4 triptype = new Window4();
+                        MessageBox.Show("Выберите тип маршрута");
+                        if (triptype.ShowDialog() == true)
                         {
-                            myConnection.Open();
-                            string oString = "Select * from Route Where number =  " + RouteNumberInAddDBPanel.Text.ToString();
-                            SqlCommand oCmd = new SqlCommand(oString, myConnection);
-                            int y = 0;
-                            string value = "0";
-                            using (SqlDataReader oReader = oCmd.ExecuteReader())
+                            Button button = (Button)sender;
+                            using (SqlConnection myConnection = new SqlConnection(@"Data Source=WIN-IEUAMMVRABR\SQLEXPRESS;Initial Catalog=MaxKravtsevich;Integrated Security=True"))
                             {
-                                while (oReader.Read())
+                                myConnection.Open();
+                                string oString = "Select * from Route Where number =  " + RouteNumberInAddDBPanel.Text.ToString();
+                                SqlCommand oCmd = new SqlCommand(oString, myConnection);
+                                int y = 0;
+                                string value = "0";
+                                using (SqlDataReader oReader = oCmd.ExecuteReader())
                                 {
-                                    y += 1;
+                                    while (oReader.Read())
+                                    {
+                                        y += 1;
 
+                                    }
                                 }
-                            }
-                            if (y == 0)
-                            {
-                                oCmd = new SqlCommand("INSERT INTO [Route] (number) VALUES (@number)", myConnection);
-                                oCmd.Parameters.AddWithValue("@number", RouteNumberInAddDBPanel.Text.ToString());
-                                oCmd.ExecuteNonQuery();
-                            }
-                            string bus_id = "0";
-                            oString = "Select * from Bus Where number =  " + passwordWindow.buscombobox.SelectedValue.ToString();
-                            oCmd = new SqlCommand(oString, myConnection);
-                            using (SqlDataReader oReader = oCmd.ExecuteReader())
-                            {
-                                while (oReader.Read())
+                                if (y == 0)
                                 {
-                                    bus_id = oReader["id"].ToString();
-
+                                    oCmd = new SqlCommand("INSERT INTO [Route] (number) VALUES (@number)", myConnection);
+                                    oCmd.Parameters.AddWithValue("@number", RouteNumberInAddDBPanel.Text.ToString());
+                                    oCmd.ExecuteNonQuery();
                                 }
-                            }
-                            oString = "Select * from Route Where number =  " + RouteNumberInAddDBPanel.Text.ToString();
-                            oCmd = new SqlCommand(oString, myConnection);
-                            using (SqlDataReader oReader = oCmd.ExecuteReader())
-                            {
-                                while (oReader.Read())
+                                string bus_id = "0";
+                                oString = "Select * from Bus Where number =  " + passwordWindow.buscombobox.SelectedValue.ToString();
+                                oCmd = new SqlCommand(oString, myConnection);
+                                using (SqlDataReader oReader = oCmd.ExecuteReader())
                                 {
-                                    value = oReader["id"].ToString();
+                                    while (oReader.Read())
+                                    {
+                                        bus_id = oReader["id"].ToString();
 
+                                    }
                                 }
+                                oString = "Select * from Route Where number =  " + RouteNumberInAddDBPanel.Text.ToString();
+                                oCmd = new SqlCommand(oString, myConnection);
+                                using (SqlDataReader oReader = oCmd.ExecuteReader())
+                                {
+                                    while (oReader.Read())
+                                    {
+                                        value = oReader["id"].ToString();
+
+                                    }
+                                }
+                                int days_type;
+                                int trip_type;
+                                int.TryParse(string.Join("", days.daystypecombobox.SelectedValue.ToString().Where(c => char.IsDigit(c))), out days_type);
+                                int.TryParse(string.Join("", triptype.triptypecombobox.SelectedValue.ToString().Where(c => char.IsDigit(c))), out trip_type);
+                                SqlCommand command = new SqlCommand("INSERT INTO [Trip] (route,bus,days_type,type) VALUES (@route,@bus,@days_type,@type)", myConnection);
+                                command.Parameters.AddWithValue("@route", value);
+                                command.Parameters.AddWithValue("@bus", bus_id);
+                                command.Parameters.AddWithValue("@days_type", days_type);
+                                command.Parameters.AddWithValue("@type", trip_type);
+                                command.ExecuteNonQuery();
+                                myConnection.Close();
                             }
-                            int days_type;
-                            int.TryParse(string.Join("", days.daystypecombobox.SelectedValue.ToString().Where(c => char.IsDigit(c))), out days_type);
-                            SqlCommand command = new SqlCommand("INSERT INTO [Trip] (route,bus,days_type) VALUES (@route,@bus,@days_type)", myConnection);
-                            command.Parameters.AddWithValue("@route", value);
-                            command.Parameters.AddWithValue("@bus", bus_id);
-                            command.Parameters.AddWithValue("@days_type", days_type);
-                            command.ExecuteNonQuery();
-                            myConnection.Close();
                         }
                     }
                     FillTrip(sender, e);
@@ -413,6 +458,7 @@ namespace busstops
                     {
                         Button _button = new Button();
                         _button.Content = "+";
+                        MessageBox.Show("Данного маршрута нет в базе/n Создайте маршрут");
                         AddTrip(_button, e);
                     }
                     myConnection.Close();
@@ -420,7 +466,7 @@ namespace busstops
             }
             catch
             {
-                MessageBox.Show("Неверынй  5 формат данных");
+                MessageBox.Show("Неверынй(5) формат данных");
             }
         }
 
@@ -469,29 +515,48 @@ namespace busstops
             }
         }
 
+        private void ChangeType(object sender, RoutedEventArgs e)
+        {
+            int type;
+            int.TryParse(string.Join("", ChangeTypeB.Content.ToString().Where(c => char.IsDigit(c))), out type);
+            Dictionary<int, int> types = new Dictionary<int, int>() { };
+            types.Add(1, 2);
+            types.Add(2, 1);
+            ChangeTypeB.Content = "↑↓   " + types[type];
+            ShowRoutePanel(sender, e);
+        }
+
         private void ShowRoutePanel(object sender, RoutedEventArgs e)
         {
             try
             {
                 HidePanels("RoutePanel");
                 Button _button = (Button)sender;
+                if (_button.Name.ToString() != "ChangeTypeB")
+                {
+                    Temp_Button.Content = ((Button)sender).Content;
+                    Temp_Button.Name = ((Button)sender).Name;
+                }
                 int RouteId;
-                int.TryParse(string.Join("", _button.Name.Where(c => char.IsDigit(c))), out RouteId);
-                RouteNumber.Content = _button.Content;
+                int type;
+                int.TryParse(string.Join("", ChangeTypeB.Content.ToString().Where(c => char.IsDigit(c))), out type);
+                int.TryParse(string.Join("", Temp_Button.Name.Where(c => char.IsDigit(c))), out RouteId);
+                RouteNumber.Content = Temp_Button.Content;
                 Dictionary<string, string[]> arrive_time = new Dictionary<string, string[]>();
                 using (SqlConnection myConnection = new SqlConnection(@"Data Source=WIN-IEUAMMVRABR\SQLEXPRESS;Initial Catalog=MaxKravtsevich;Integrated Security=True"))
                 {
                     Stops.Children.Clear();
                     string oString;
                     TimeSpan now = DateTime.Now - DateTime.Now.Date;
-                    if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday || DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
-                    {
-                        oString = "SELECT Stop.id AS id,name,time FROM Arrive_Time join Stop on Arrive_Time.stop = Stop.id join Trip on Arrive_Time.trip = Trip.id join Route on Trip.route = Route.id join Days_Type on Trip.days_type = Days_Type.id where Route.number = " + _button.Content + "and Days_Type.id = 2 order by ABS(DATEDIFF(Second, time, " + now.Hours + '.' + now.Minutes + "))";
-                    }
-                    else
-                    {
-                        oString = "SELECT Stop.id AS id,name,time FROM Arrive_Time join Stop on Arrive_Time.stop = Stop.id join Trip on Arrive_Time.trip = Trip.id join Route on Trip.route = Route.id join Days_Type on Trip.days_type = Days_Type.id where Route.number = " + _button.Content + "and Days_Type.id = 1 order by ABS(DATEDIFF(Second, time, " + now.Hours + '.' + now.Minutes + "))";
-                    }
+
+                    //if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday || DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+                    //{
+                    //oString = "SELECT Stop.id AS id,name,time, Trip.id as trip FROM Arrive_Time join Stop on Arrive_Time.stop = Stop.id join Trip on Arrive_Time.trip = Trip.id join Route on Trip.route = Route.id join Days_Type on Trip.days_type = Days_Type.id where Route.number = " + Temp_Button.Content + " and Days_Type.id = 2 and Trip.type = " + type + " order by ABS(DATEDIFF(Second, time, '" + now.Hours + ':' + now.Minutes + "'))";
+                    //}
+                    //else
+                    //{
+                    oString = "SELECT Stop.id AS id,name,time, Trip.id as trip FROM Arrive_Time join Stop on Arrive_Time.stop = Stop.id join Trip on Arrive_Time.trip = Trip.id join Route on Trip.route = Route.id join Days_Type on Trip.days_type = Days_Type.id where Route.number = " + Temp_Button.Content + " and Days_Type.id = 1 and Trip.type = " + type + " order by ABS(DATEDIFF(Second, time, '" + now.Hours + ':' + now.Minutes + "'))";
+                    //}
                     SqlCommand oCmd = new SqlCommand(oString, myConnection);
                     myConnection.Open();
                     using (SqlDataReader oReader = oCmd.ExecuteReader())
@@ -502,11 +567,11 @@ namespace busstops
                             {
                                 if ((TimeSpan)oReader["time"] > now)
                                 {
-                                    arrive_time.Add(oReader["name"].ToString(), new string[2] { oReader["id"].ToString(), Convert.ToString(Convert.ToInt32(((TimeSpan)oReader["time"] - now).TotalMinutes)) });
+                                    arrive_time.Add(oReader["name"].ToString(), new string[3] { oReader["id"].ToString(), Convert.ToString(Convert.ToInt32(((TimeSpan)oReader["time"] - now).TotalMinutes)), oReader["trip"].ToString() });
                                 }
                                 else
                                 {
-                                    arrive_time.Add(oReader["name"].ToString(), new string[2] { oReader["id"].ToString(), Convert.ToString(Convert.ToInt32((new TimeSpan(24, 0, 0) - now + (TimeSpan)oReader["time"]).TotalMinutes)) });
+                                    arrive_time.Add(oReader["name"].ToString(), new string[3] { oReader["id"].ToString(), Convert.ToString(Convert.ToInt32((new TimeSpan(24, 0, 0) - now + (TimeSpan)oReader["time"]).TotalMinutes)), oReader["trip"].ToString() });
                                 }
                             }
                             catch
@@ -514,18 +579,27 @@ namespace busstops
 
                             }
                         }
-
                         myConnection.Close();
                     }
                 }
-                arrive_time = arrive_time.OrderBy(key => System.Convert.ToInt32(key.Value[0])).ToDictionary((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
+                if (type == 1)
+                {
+                    arrive_time = arrive_time.OrderBy(key => System.Convert.ToInt32(key.Value[0])).ToDictionary((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
+
+                }
+                else
+                {
+                    arrive_time = arrive_time.OrderByDescending(key => System.Convert.ToInt32(key.Value[0])).ToDictionary((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
+                }
                 foreach (var pair in arrive_time)
                 {
                     TextBox stop = new TextBox();
                     stop.FontSize = 25;
                     stop.FontFamily = new FontFamily("Tele-Marin");
                     stop.Text += "• " + pair.Value[1] + "м " + pair.Key;
-                    stop.IsEnabled = false;
+                    stop.Name = "id"+pair.Value[2];
+                    stop.IsReadOnly = true;
+                    stop.PreviewMouseDown += ShowRouteByTime;
                     Stops.Children.Add(stop);
                 }
             }
@@ -534,6 +608,94 @@ namespace busstops
                 MessageBox.Show("Неверынй 21 формат данных");
             }
 
+        }
+
+        private void ShowBusOnStop(object sender, RoutedEventArgs e)
+        {
+            Window5 showroute = new Window5();
+            SqlConnection con = new SqlConnection(@"Data Source=WIN-IEUAMMVRABR\SQLEXPRESS;Initial Catalog=MaxKravtsevich;Integrated Security=True");
+            con.Open();
+            string oString;
+            int trip;
+            int.TryParse(string.Join("", ((TextBox)sender).Name.ToString().Where(c => char.IsDigit(c))), out trip);
+            oString = "SELECT Route.id,Route.number from stop join Arrive_Time on Arrive_Time.stop = Stop.id join Trip on Trip.id = Arrive_Time.trip join Route on Route.id = Trip.route where Stop.id = "+trip;
+            SqlCommand cmd = new SqlCommand(oString, con);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            showroute.StopsByTrip.Children.Clear();
+            Dictionary<int, int> routes = new Dictionary<int, int>() { };
+            using (SqlDataReader oReader = cmd.ExecuteReader())
+            {
+                while (oReader.Read())
+                {
+                    try
+                    {
+                        routes.Add(Convert.ToInt32(oReader["id"]), Convert.ToInt32(oReader["number"]));
+                        Button _button = new Button();
+                        _button.Name = "id" + oReader["id"].ToString();
+                        _button.Height = 75;
+                        _button.Width = 75;
+                        _button.Margin = new Thickness(1);
+                        _button.Content = oReader["number"].ToString();
+                        _button.Click += ShowRoutePanel;
+                        showroute.StopsByTrip.Children.Add(_button);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            cmd.Dispose();
+            con.Close();
+            showroute.ShowDialog();
+        }
+        private void ShowRouteByTime(object sender, RoutedEventArgs e)
+        {
+            int trip;
+            int.TryParse(string.Join("", ((TextBox)sender).Name.ToString().Where(c => char.IsDigit(c))), out trip);
+            int type;
+            int.TryParse(string.Join("", ChangeTypeB.Content.ToString().Where(c => char.IsDigit(c))), out type);
+            Window5 showroute = new Window5();
+            SqlConnection con = new SqlConnection(@"Data Source=WIN-IEUAMMVRABR\SQLEXPRESS;Initial Catalog=MaxKravtsevich;Integrated Security=True");
+            con.Open();
+            string oString;
+            //if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday || DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+            //{
+            //    oString = "SELECT name,time FROM Arrive_Time join Stop on Arrive_Time.stop = Stop.id join Trip on Arrive_Time.trip = Trip.id join Route on Trip.route = Route.id join Days_Type on Trip.days_type = Days_Type.id where Route.number = " + Temp_Button.Content + " and Days_Type.id = 2 and Trip.type = " + type + " and trip = "+trip;
+            //}
+            //else
+            //{
+                oString = "SELECT Stop.id, name,time FROM Arrive_Time join Stop on Arrive_Time.stop = Stop.id join Trip on Arrive_Time.trip = Trip.id join Route on Trip.route = Route.id join Days_Type on Trip.days_type = Days_Type.id where Route.number = " + Temp_Button.Content + " and Days_Type.id = 1 and Trip.type = " + type + " and trip = " + trip;
+            //}
+            SqlCommand cmd = new SqlCommand(oString, con);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            showroute.StopsByTrip.Children.Clear();
+            using (SqlDataReader oReader = cmd.ExecuteReader())
+            {
+                while (oReader.Read())
+                {
+                    try
+                    {
+                        TextBox stop = new TextBox();
+                        stop.FontSize = 25;
+                        stop.FontFamily = new FontFamily("Tele-Marin");
+                        stop.Text += "• " + oReader["time"].ToString()+ " | " +oReader["name"].ToString();
+                        stop.Name = "id"+oReader["id"].ToString();
+                        stop.IsReadOnly = true;
+                        stop.PreviewMouseDown += ShowBusOnStop;
+                        showroute.StopsByTrip.Children.Add(stop);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            cmd.Dispose();
+            con.Close();
+            showroute.ShowDialog();
         }
         public void Close(object sender, RoutedEventArgs e)
         {
